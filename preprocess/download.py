@@ -8,6 +8,11 @@ from google_drive_downloader import GoogleDriveDownloader as gd
 # actions = pd.read_csv(csv_raw, delimiter='\t')
 # print(actions.head(10))
 
-gd.download_file_from_google_drive(file_id=config.FILE_ID,
-                                   dest_path=os.path.join(config.PATH,config.ACTION_TRAIN_FILE),
+if not os.path.exists(config.PATH):
+    os.makedirs(config.PATH)
+gd.download_file_from_google_drive(file_id=config.ACTIONS_FILE_ID,
+                                   dest_path=os.path.join(config.PATH, config.ACTION_TRAIN_FILE),
+                                   unzip=True)
+gd.download_file_from_google_drive(file_id=config.BOOKINGS_FILE_ID,
+                                   dest_path=os.path.join(config.PATH, config.BOOKINGS_TRAIN_FILE),
                                    unzip=True)
