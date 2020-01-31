@@ -3,14 +3,13 @@ import os
 import pandas as pd
 from tqdm import tqdm
 import numpy as np
-
-actions = pd.read_csv(os.path.join(config.PATH, config.ACTION_TRAIN_FILE),
-                      delimiter='\t')
-print(actions.head())
-print(actions.step.max())
+import re
+import pickle
 
 
 def clean_sessions() -> list:
+    actions = pd.read_csv(os.path.join(config.PATH, config.ACTION_TRAIN_FILE),
+                          delimiter='\t')
     session_list = actions.session_id.unique().tolist()
     n_actions = []
     for session in tqdm(session_list):
@@ -48,7 +47,29 @@ def split_and_pivot(session_list: list):
 
             act_book = pd.merge(bookings, actions)
 
-            act_book.to_csv(os.path.join(config.PATH, 'act_book' + str(i) + '.csv'), index=True)
+            if not os.path.exists(os.path.join(config.PATH, 'ActBook')):
+                os.makedirs(os.path.join(config.PATH, 'ActBook'))
+            act_book.to_csv(os.path.join(config.PATH, 'ActBook', 'act_book' + str(i) + '.csv'), index=True)
 
             lower_limit += batch_size
             upper_limit += batch_size
+
+
+def merge(files_folder: str) -> pd.DataFrame:
+    def atoi(text):
+        return int(text) if text.isdigit() else text
+
+    def natural_keys(text):
+        return [atoi(c) for c in re.split(r'(\d+)', text)]
+
+    files = os.listdir(os.path.join(config.PATH, files_folder))
+    files.sort(key=natural_keys)
+
+    sessions_merged = pd.DataFrame(data=None, columns=None)
+    for file in files:
+        sessions_merged = pd.concat([sessions_merged, pd.read_csv(os.path.join(config.PATH, files_folder, file),
+                                                                  index_col=0)], axis=0, ignore_index=True)
+
+    return sessions_merged
+
+# sessions_merged = merge('ActBook')
