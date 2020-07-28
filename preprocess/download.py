@@ -1,18 +1,32 @@
 from config import config
 import os
 from google_drive_downloader import GoogleDriveDownloader as gd
+import concurrent.futures
+import time
 
-# url = requests.get('https://drive.google.com/open?id=1paXv0q1YVZkMQcJQpi5PdCGLnmwtmW5D')
-# csv_raw = StringIO(url.text)
-# print(str(csv_raw)[0])
-# actions = pd.read_csv(csv_raw, delimiter='\t')
-# print(actions.head(10))
+# data_path = os.path.join(os.getcwd(), config.PATH)
 
-if not os.path.exists(config.PATH):
-    os.makedirs(config.PATH)
-gd.download_file_from_google_drive(file_id=config.ACTIONS_FILE_ID,
-                                   dest_path=os.path.join(config.PATH, config.ACTION_TRAIN_FILE),
-                                   unzip=True)
-gd.download_file_from_google_drive(file_id=config.BOOKINGS_FILE_ID,
-                                   dest_path=os.path.join(config.PATH, config.BOOKINGS_TRAIN_FILE),
-                                   unzip=True)
+files_dict = {config.ACTION_TRAIN_FILE: config.ACTIONS_FILE_ID,
+              config.BOOKINGS_TRAIN_FILE: config.BOOKINGS_FILE_ID}
+files = [config.ACTION_TRAIN_FILE, config.BOOKINGS_TRAIN_FILE]
+
+
+def download(file):
+    if not os.path.exists(config.PATH):
+        os.makedirs(config.PATH)
+    gd.download_file_from_google_drive(file_id=files_dict[file],
+                                       dest_path=os.path.join(config.PATH, file),
+                                       unzip=True)
+
+
+def run():
+    t1 = time.perf_counter()
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        executor.map(download, files)
+
+    t2 = time.perf_counter()
+    print(f'Finished in {t2 - t1} seconds')
+
+
+if __name__ == "__main__":
+    run()

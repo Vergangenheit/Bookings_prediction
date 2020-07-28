@@ -1,0 +1,6 @@
+googledrivedownloader==0.4
+tensorflow>=2.2.0
+numpy>=1.19.0
+pandas>=1.0.5
+scikit-learn>=0.23.1
+tqdm>=4.46.1
