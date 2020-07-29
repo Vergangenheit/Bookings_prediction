@@ -3,6 +3,7 @@ import os
 from google_drive_downloader import GoogleDriveDownloader as gd
 import concurrent.futures
 import time
+import pandas as pd
 
 # data_path = os.path.join(os.getcwd(), config.PATH)
 
@@ -23,9 +24,13 @@ def run():
     t1 = time.perf_counter()
     with concurrent.futures.ProcessPoolExecutor() as executor:
         executor.map(download, files)
-
+    #load actions file and count n unique actions
+    actions = actions = pd.read_csv(os.path.join(config.PATH, config.ACTIONS_FILE_ID), delimiter='\t')
+    no_unique_actions = actions['action_id'].nunique()
     t2 = time.perf_counter()
     print(f'Finished in {t2 - t1} seconds')
+
+    return no_unique_actions
 
 
 if __name__ == "__main__":

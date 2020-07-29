@@ -3,7 +3,7 @@ from preprocess.etl1 import merge, clean_sessions, split_and_pivot, extract_feat
 
 if __name__ == "__main__":
     #download
-    run()
+    no_unique_actions = run()
 
     #preprocess
     session_list_cleaned = clean_sessions()
