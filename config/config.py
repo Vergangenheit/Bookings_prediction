@@ -8,3 +8,4 @@ BOOKINGS_TRAIN_FILE = 'case_study_bookings_train.csv'
 
 EPOCHS = 15
 BATCH_SIZE = 128
+MODEL_PATH = "model.hdf5"
