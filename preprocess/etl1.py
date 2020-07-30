@@ -70,7 +70,22 @@ def merge(files_folder: str) -> pd.DataFrame:
         sessions_merged = pd.concat([sessions_merged, pd.read_csv(os.path.join(config.PATH, files_folder, file),
                                                                   index_col=0)], axis=0, ignore_index=True)
 
+    sessions_merged.iloc[:, 2:] = sessions_merged.iloc[:, 2:].astype(str)
+
     return sessions_merged
+
+
+def extract_no_actions(sessions_merged: pd.DataFrame) -> dict:
+    """takes in the sessions_merged df, repivots it and constructs the dictionary of actions to integer id
+    Returns: act_to_index:Dict"""
+    sessions_melt = pd.melt(sessions_merged, id_vars=['session_id'], value_vars=[str(i + 1) for i in range(60)])
+    act_to_index = {}
+    id = 1
+    for i in sessions_melt.value.unique():
+        act_to_index[i] = id
+        id += 1
+
+    return act_to_index
 
 
 # sessions_merged = merge('ActBook')
